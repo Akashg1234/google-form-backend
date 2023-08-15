@@ -10,18 +10,9 @@ const formSchema = new Schema(
     formTitle: {
       type: String,
       required: true,
-      default: "Untitled question",
+      default: "Untitled Form",
     },
-    formHeading: {
-      type: String,
-      required: true,
-      default: "Form heading",
-      style: {
-        bold: false,
-        italic: false,
-        underline: false,
-      },
-    },
+
     headerImage: {
       public_id: {
         type: "String",
@@ -30,13 +21,25 @@ const formSchema = new Schema(
         type: "String",
       },
     },
-    headerFont: {
-      type: String,
-      default: "Arial",
-    },
-    headerFontSize: {
-      type: Number,
-      default: 16,
+    header: {
+      formHeadingText: {
+        type: String,
+        required: true,
+        default: "Form heading",
+      },
+      font: {
+        type: String,
+        default: "Arial",
+        style: {
+          bold: { type: Boolean, default: false },
+          italic: { type: Boolean, default: false },
+          underline: { type: Boolean, default: false },
+        },
+        size: {
+          type: Number,
+          default: 16,
+        },
+      },
     },
     textFont: {
       type: String,
@@ -62,35 +65,11 @@ const formSchema = new Schema(
         url: String,
       },
     },
+    // refencing to the question model
     questions: [
       {
-        questionTitle: {
-          type: String,
-          default: "",
-        },
-        description: {
-          type: String,
-        },
-        imageOfTheQuestion: {
-          public_id: {
-            type: "String",
-          },
-          url: {
-            type: "String",
-          },
-        },
-        typeOfAnsField: { type: String },
-        required: {
-          type: Boolean,
-        },
-        questionFont: {
-          type: String,
-          default: "Arial",
-        },
-        questionFontSize: {
-          type: Number,
-          default: 16,
-        },
+        type: Schema.Types.ObjectId,
+        ref: "Question",
       },
     ],
 
@@ -100,8 +79,14 @@ const formSchema = new Schema(
         default: "Incorrect answer",
       },
     },
+    // referencing to the response model
+    responses: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Response",
+      },
+    ],
 
-    responses: [{}],
     colorTheme: {
       formColor: String,
       backGroundColor: String,

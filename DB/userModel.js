@@ -27,6 +27,10 @@ const userSchema = new Schema(
       minLength: [8, "Password should be atleast 8 charecter long"],
       select: false,
     },
+    formsCreated: [{
+      ref: "Form",
+      type: Schema.Types.ObjectId,
+    }],
     ResetPasswordToken: String,
     ResetPasswordExpire: Date,
   },
