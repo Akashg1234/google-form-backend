@@ -15,8 +15,26 @@ const questionSchema = new Schema(
     questionDescription: {
       type: String,
     },
+    // image of the question public_id and its url
+    imageOfTheQuestion: {
+      public_id: {
+        type: "String",
+      },
+      url: {
+        type: "String",
+      },
+    },
+    // video of the question public_id and its url
+    videoOfTheQuestion: {
+      public_id: {
+        type: "String",
+      },
+      url: {
+        type: "String",
+      },
+    },
     // question type
-    fileOfTheQuestion: {
+    ansFileOfTheQuestion: {
       // Allow only specific file types
       isAllowedSpecificFileType: {
         type: Boolean,
@@ -48,30 +66,16 @@ const questionSchema = new Schema(
         },
       },
       // maximum size of the file
-      fileSize:{
-        type:Number,
+      fileSize: {
+        type: Number,
       },
       // number of files
-      numberOfFiles:{
-        type:Number,
-      }
-
+      numberOfFiles: {
+        type: Number,
+      },
     },
     // which type of answer will be given to the question
-    typeOfAnsField: { type: String },
-    // is this question required to be answered
-    required: {
-      type: Boolean,
-    },
-    questionFont: {
-      type: String,
-      default: "Arial",
-    },
-    questionFontSize: {
-      type: Number,
-      default: 16,
-    },
-    answer: {
+    typeOfAnsField: {
       shortAnswer: {
         type: String,
       },
@@ -87,21 +91,49 @@ const questionSchema = new Schema(
       checkBox: {
         type: Boolean,
       },
+
       dropDown: {
         type: Boolean,
       },
+    },
+    // is this question required to be answered
+    required: {
+      type: Boolean,
+    },
+    // question font
+    questionFont: {
+      type: String,
+      default: "Arial",
+    },
+    // question font size
+    questionFontSize: {
+      type: Number,
+      default: 16,
+    },
+    answer: {
+      shortAnswer: {
+        type: String,
+      },
+      pargraphAnswer: {
+        type: String,
+      },
+      // suffel the option order of the answer option
       suffelOptionOrder: {
         type: Boolean,
         default: false,
       },
+      // the given answer options/option
       givenAnswerOptions: [
         {
           type: Schema.Types.Mixed,
         },
       ],
-      correctAnswerOptions: {
-        type: Schema.Types.Mixed,
-      }
+      // the correct answer options/option
+      correctAnswerOptions: [
+        {
+          type: Schema.Types.Mixed,
+        },
+      ],
     },
   },
   { timestamps: true }
