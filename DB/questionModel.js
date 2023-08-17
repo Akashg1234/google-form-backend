@@ -17,20 +17,43 @@ const questionSchema = new Schema(
     },
     // image of the question public_id and its url
     imageOfTheQuestion: {
+      left: {
+        type: Boolean,
+      },
+      right: {
+        type: Boolean,
+      },
+      center: {
+        type: Boolean,
+      },
       public_id: {
-        type: "String",
+        type: String,
       },
       url: {
-        type: "String",
+        type: String,
+      },
+      caption: {
+        type: String,
       },
     },
     // video of the question public_id and its url
     videoOfTheQuestion: {
-      public_id: {
-        type: "String",
+      left: {
+        type: Boolean,
+        default:true
+      },
+      right: {
+        type: Boolean,
+      },
+      center: {
+        type: Boolean,
       },
       url: {
-        type: "String",
+        type: String,
+
+      },
+      caption: {
+        type: String,
       },
     },
     // question type
@@ -47,24 +70,7 @@ const questionSchema = new Schema(
           enum: ["pdf", "doc", "docx", "jpg", "png", "jpeg"],
         },
       ],
-      // image of the question public_id and its url
-      imageOfTheQuestion: {
-        public_id: {
-          type: "String",
-        },
-        url: {
-          type: "String",
-        },
-      },
-      // video of the question public_id and its url
-      videoOfTheQuestion: {
-        public_id: {
-          type: "String",
-        },
-        url: {
-          type: "String",
-        },
-      },
+      
       // maximum size of the file
       fileSize: {
         type: Number,

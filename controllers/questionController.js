@@ -1,9 +1,19 @@
 import handleAsync from "async-error-handler";
 import { questionModel } from "../DB/questionModel";
 import { formModel } from "../DB/formModel";
-import { mediaCloud } from "../index.js";
 import { errorThrow } from "../utils/errorHandler";
+import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile";
+import {URL} from 'url'
 
+const checkUrl=(givenUrl)=>{
+  try {
+    new URL(givenUrl)
+    return true
+  } catch (error) {
+    return false
+  }
+
+}
 export const createQuestion= handleAsync(async (req, res) => {
     const { questionTitle, typeOfAnsField, givenAnswerOptions } = req.body;
     const newQuestion = await questionModel.create({
@@ -21,8 +31,9 @@ export const createQuestion= handleAsync(async (req, res) => {
 
 export const deleteQuestion = handleAsync(
   async (req, res) => {
-
+// get the questionid , which will be deleted
     const questionId = req.params.questionId;
+    // get formid,from which the question will be deleted
     const formId = req.params.formId;
 
     const newQuestion = await questionModel.findByIdAndDelete({
@@ -30,15 +41,12 @@ export const deleteQuestion = handleAsync(
     });
 
     await newQuestion.save();
-
-    const newForm =await formModel.findByIdAndUpdate(
-      { _id:formId },
-      {
-        $pull: {
-          questions: { questionId },
-        },
-      }
+// find the form to pull the question id
+    const newForm =await formModel.findById(
+      { formId }
     );
+// pull out the question id from the array of questions of the given form
+    newForm.questions.pull(questionId);
 
     await newForm.save();
 
@@ -62,7 +70,7 @@ export const updateQuestionTitle = handleAsync(
       questionId},{
       questionTitle: questionTitle,
     },{new:true});
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       newQuestion,
     });
@@ -86,7 +94,7 @@ export const updateTypesOfQuestion = handleAsync(
       },
       { new: true }
     );
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       newQuestion,
     });
@@ -100,17 +108,16 @@ export const addMultipleAnswer = handleAsync(
     const { ansOption } = req.body;
     // get the questionId from the params
     const questionId = req.params.questionId;
-
-    const newQuestion = await questionModel.findById(
-      {
-        questionId,
-      });
+    // find the form to pull the question id
+    const newQuestion = await questionModel.findById({
+      questionId,
+    });
 
     newQuestion.answer.givenAnswerOptions.push(ansOption);
 
     await newQuestion.save();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       newQuestion,
     });
@@ -120,22 +127,27 @@ export const addMultipleAnswer = handleAsync(
 
 export const addImageToQuestion = handleAsync(
   async (req, res) => {
+    
+    // get new question title from the body
+    const file = req.files;
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
     let newQuestion = await questionModel.findById({
       questionId,
     });
     if (!newQuestion) {
-      errorThrow("Form not found", 404, "Missing document");
+      errorThrow("Question not found", 404, "Missing document");
     }
-    // get new question title from the body
-    const file = req.file;
-    // get the questionId from the params
-    const questionId = req.params.questionId;
 
-    newQuestion.answer.givenAnswerOptions.push(ansOption);
-
+    const myCloud = await fileUploadToCloudinary(file[0].path);
+// add the image url and public id to the question 
+    newQuestion.imageOfTheQuestion.public_id=myCloud.public_id;
+    newQuestion.imageOfTheQuestion.url=myCloud.secure_url;
+    
     await newQuestion.save();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       newQuestion,
     });
@@ -143,3 +155,258 @@ export const addImageToQuestion = handleAsync(
   (err, req, res, next) => next(err)
 );
 
+
+export const deleteImageToQuestion = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+// delete the image from cloudinary
+    await fileDeleteFromCloudinary(newQuestion.imageOfTheQuestion.public_id);
+    // add the image url and public id to the question
+    newQuestion.imageOfTheQuestion.public_id = undefined;
+    newQuestion.imageOfTheQuestion.url = undefined;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// update the image of the question
+export const updateImageToQuestion = handleAsync(
+  async (req, res) => {
+    // get new question title from the body
+    const file = req.files;
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+// first delete the image from cloudinary
+    await fileDeleteFromCloudinary(newQuestion.imageOfTheQuestion.public_id);
+    // upload the new image to cloudinary
+    const myCloud = await fileUploadToCloudinary(file[0].path);
+// and assign the new image url and public id to the question
+    newQuestion.imageOfTheQuestion.public_id = myCloud.public_id;
+    newQuestion.imageOfTheQuestion.url = myCloud.secure_url;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+
+// add image caption to the question
+export const addImageCaptionToQuestion = handleAsync(
+  async (req, res) => {
+    // get new question title from the body
+    const imageCaption = req.body.imageCaption; 
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+// assign the image caption to the question
+    newQuestion.imageOfTheQuestion.caption = imageCaption;
+    
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// delete image caption to the question
+export const deleteImageCaptionToQuestion = handleAsync(
+  async (req, res) => {
+    
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+
+    newQuestion.imageOfTheQuestion.caption = undefined;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// Add video to question
+
+export const addVideoCaptionToQuestion = handleAsync(
+  async (req, res) => {
+    // get caption from body
+    const videoCaption = req.body.videoCaption;
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+    if (!newQuestion) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // add the caption to the video object
+
+    newQuestion.videoOfTheQuestion.caption = videoCaption;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// delete the video caption which is associated with the question
+
+export const deleteVideoCaptionToQuestion = handleAsync(
+  async (req, res) => {
+    
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+// undefine the caption of the video object
+    newQuestion.videoOfTheQuestion.caption = undefined;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// add video to question
+export const addVideoToQuestion = handleAsync(
+  async (req, res) => {
+    // get new url of the video from the body
+    const fileUrl = req.body.fileUrl;
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+
+    newQuestion.videoOfTheQuestion.url = fileUrl;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+
+
+// delete the video which is associated with the question
+
+export const deleteVideoToQuestion = handleAsync(
+  async (req, res) => {
+    
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+
+    newQuestion.videoOfTheQuestion.url = undefined;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+
+export const updateVideoAllignmentToQuestion = handleAsync(
+  async (req, res) => {
+    const videoAlignment = req.body.videoAlignment;
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+
+    newQuestion.videoOfTheQuestion.url = undefined;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
