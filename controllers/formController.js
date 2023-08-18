@@ -1,6 +1,6 @@
 import handleAsync from "async-error-handler"
 import { formModel } from "../DB/formModel";
-import { fileUploadToCloudinary } from "../middlewares/imageUploadToFile";
+import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile";
 
 export const handleUserFormCreation = handleAsync(
   async (req, res) => {
@@ -40,8 +40,8 @@ const formId = req.params.formId;
   (err, req, res, next) => next(err)
 );
 
-
-export const updateFormHeaderImage = handleAsync(
+// add form header image
+export const addFormHeaderImage = handleAsync(
   async (req, res) => {
     // get the form title from the request body
     const file = req.files;
@@ -69,7 +69,35 @@ export const updateFormHeaderImage = handleAsync(
   (err, req, res, next) => next(err)
 );
 
+// update form header image
+export const updateFormHeaderImage = handleAsync(
+  async (req, res) => {
+    // get the form title from the request body
+    const file = req.files;
+    // get the form id from the url
+    const formId = req.params.formId;
 
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(formId)
+    // delete the old file from the cloudinary
+    await fileDeleteFromCloudinary(newForm.headerImage.public_id)
+    // upload file to the cloudinary
+    const myCloud = await fileUploadToCloudinary(file.path);
+    
+    newForm.headerImage.public_id= myCloud.public_id
+    newForm.headerImage.url= myCloud.secure_url
+    
+    await newForm.save()
+
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// update form header font
 
 export const updateFormHeaderFont = handleAsync(
   async (req, res) => {
@@ -177,7 +205,7 @@ export const updateFormFontSize = handleAsync(
 );
 
 // update only question font size
-export const updateQestionFontSize = handleAsync(
+export const updateQuestionFontSize = handleAsync(
   async (req, res) => {
     // form heading font from the request body
     const { formQuestionFontSize } = req.body;
