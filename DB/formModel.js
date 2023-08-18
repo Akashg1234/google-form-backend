@@ -15,10 +15,10 @@ const formSchema = new Schema(
 
     headerImage: {
       public_id: {
-        type: "String",
+        type: String,
       },
       url: {
-        type: "String",
+        type: String,
       },
     },
     header: {
@@ -41,6 +41,22 @@ const formSchema = new Schema(
         },
       },
     },
+    question: {
+     
+      font: {
+        type: String,
+        default: "Arial",
+        style: {
+          bold: { type: Boolean, default: false },
+          italic: { type: Boolean, default: false },
+          underline: { type: Boolean, default: false },
+        },
+        size: {
+          type: Number,
+          default: 16,
+        },
+      },
+    },
     textFont: {
       type: String,
       default: "Arial",
@@ -49,22 +65,7 @@ const formSchema = new Schema(
       type: Number,
       default: 16,
     },
-    formDescription: {
-      type: String,
-      style: {
-        bold: { type: Boolean, default: false },
-        italic: { type: Boolean, default: false },
-        underline: { type: Boolean, default: false },
-        orderedList: { type: Boolean, default: false },
-        unorderedList: { type: Boolean, default: false },
-      },
-      default: "Form description",
-      required: true,
-      link: {
-        text: String,
-        url: String,
-      },
-    },
+
     // refencing to the question model
     questions: [
       {
@@ -86,31 +87,37 @@ const formSchema = new Schema(
         ref: "Response",
       },
     ],
-
+    // color theme of the form
     colorTheme: {
       formColor: String,
       backGroundColor: String,
     },
-
+    // form settings
     settings: {
+      // is the form used for quiz
       isQuized: {
         type: Boolean,
         default: false,
       },
+      // should responce will collect email
       isCollectEmail: {
         type: Boolean,
       },
+      // is the question shuffled
       isSuffled: {
         type: Boolean,
       },
       isShowProgressBar: {
         type: Boolean,
       },
+      // responce submit confirmmation message
       confirmationMessage: {
         type: String,
         default: "Thank you for submitting the response",
       },
     },
+    // will every question required to be answered
+
     default: {
       isQuestionRequired: {
         type: Boolean,

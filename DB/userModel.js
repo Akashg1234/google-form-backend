@@ -1,4 +1,7 @@
 import { Schema,model } from "./dbUtils";
+import bcrypt from "bcryptjs";
+import { randomBytes, createHash } from "crypto";
+import jwt from "jsonwebtoken";
 
 const userSchema = new Schema(
   {
@@ -37,4 +40,32 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  this.password = await bcrypt.hash(this.password, 15);
+  next();
+});
+
+userSchema.methods.comparePassword = async function (givenPassword) {
+  return await bcrypt.compare(givenPassword, this.password);
+};
+
+userSchema.methods.getPasswordResetToken = function () {
+  let resetToken = randomBytes(100).toString("hex");
+
+  this.resetToken = createHash("sha256").update(resetToken).digest("hex");
+  this.resetTokenExpire = Date.now() + 1800000;
+
+  return resetToken;
+};
+
+userSchema.methods.getJwtToken = function () {
+  return jwt.sign({ jwt_user_id: this._id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: "15d",
+  });
+};
 export const userModel = model("User", userSchema);

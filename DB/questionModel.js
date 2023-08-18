@@ -83,10 +83,10 @@ const questionSchema = new Schema(
     // which type of answer will be given to the question
     typeOfAnsField: {
       shortAnswer: {
-        type: String,
+        type: Boolean,
       },
       pargraphAnswer: {
-        type: String,
+        type: Boolean,
       },
       mcq: {
         type: Boolean,

@@ -28,7 +28,8 @@ export const createQuestion= handleAsync(async (req, res) => {
     })
 },(err,req,res,next)=>next(err))
 
-
+// make is required or not required
+// delete to question from the form
 export const deleteQuestion = handleAsync(
   async (req, res) => {
 // get the questionid , which will be deleted
@@ -124,7 +125,7 @@ export const addMultipleAnswer = handleAsync(
   },
   (err, req, res, next) => next(err)
 );
-
+// add answer to the question
 export const addImageToQuestion = handleAsync(
   async (req, res) => {
     
@@ -270,6 +271,43 @@ export const deleteImageCaptionToQuestion = handleAsync(
   (err, req, res, next) => next(err)
 );
 
+// update the image alignment to the question
+export const updateImageAllignmentToQuestion = handleAsync(
+  async (req, res) => {
+    const imageAlignment = req.body.imageAlignment;
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById({
+      questionId,
+    });
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+
+    if(imageAlignment === "left"){
+      newQuestion.imageOfTheQuestion.left = true;
+    }
+    else if(imageAlignment === "right"){
+      newQuestion.imageOfTheQuestion.right = true;
+    
+    }
+    else if(imageAlignment === "center"){
+      newQuestion.imageOfTheQuestion.center = true;
+    
+    }
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
 // Add video to question
 
 export const addVideoCaptionToQuestion = handleAsync(
@@ -384,7 +422,7 @@ export const deleteVideoToQuestion = handleAsync(
   (err, req, res, next) => next(err)
 );
 
-
+// update the video alignment to the question
 export const updateVideoAllignmentToQuestion = handleAsync(
   async (req, res) => {
     const videoAlignment = req.body.videoAlignment;
@@ -399,7 +437,17 @@ export const updateVideoAllignmentToQuestion = handleAsync(
       errorThrow("Question not found", 404, "Missing document");
     }
 
-    newQuestion.videoOfTheQuestion.url = undefined;
+    if(videoAlignment === "left"){
+      newQuestion.videoOfTheQuestion.left = true;
+    }
+    else if(videoAlignment === "right"){
+      newQuestion.videoOfTheQuestion.right = true;
+    
+    }
+    else if(videoAlignment === "center"){
+      newQuestion.videoOfTheQuestion.center = true;
+    
+    }
 
     await newQuestion.save();
 
