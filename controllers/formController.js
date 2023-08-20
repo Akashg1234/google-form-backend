@@ -1,15 +1,22 @@
 import handleAsync from "async-error-handler"
 import { formModel } from "../DB/formModel";
 import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile";
+import { sendMail } from "../utils/sendEmail";
+import {createHash} from 'crypto'
 
 export const handleUserFormCreation = handleAsync(
   async (req, res) => {
     const {formTitle,formHeadingText} = req.body;
 
+    const hashSecret = Date.now().toString()+process.env.HASH_SECRET
+
+    const uniqueLink = createHash('sha256').update(hashSecret).digest('hex')
+
     const newForm = await formModel.create({
       creator: req.body,
       formTitle: formTitle,
-      header:{formHeadingText: formHeadingText},
+      header: { formHeadingText: formHeadingText },
+      uniqueLink: uniqueLink,
     });
 
     res.status(201).json({
@@ -20,7 +27,38 @@ export const handleUserFormCreation = handleAsync(
   (err, req, res, next) => next(err)
 );
 
+// delete the form of 
+export const deleteTheForm = handleAsync(
+  async (req, res) => {
+    // get the form id from the url
+    const formId = req.params.formId;
+    const deletedForm = await formModel.findByIdAndDelete(formId);
 
+    res.status(200).json({
+      success: true,
+      deletedForm,
+    
+  })
+},
+  (err, req, res, next) => next(err)
+)
+
+// get the form of given id
+export const getTheForm = handleAsync(
+  async (req, res) => {
+    // get the form id from the url
+    const formId = req.params.formId;
+    const deletedForm = await formModel.findByIdAndDelete(formId);
+
+    res.status(200).json({
+      success: true,
+      deletedForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// update the form title
 export const updateFormTitle = handleAsync(
   async (req, res) => {
     // get the form title from the request body
@@ -255,6 +293,72 @@ export const updateQuestionFont = handleAsync(
     res.status(200).json({
       success: true,
       newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// share the form via unique link in email
+export const shareFormViaEmails = handleAsync(
+  async (req, res) => {
+    // form heading font from the request body
+    const { emailAddresses,subject,message  } = req.body;
+    // get the form id from the url
+    const formId = req.params.formId;
+
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(formId);
+
+    const url = `${process.env.CLIENT_URL}/form/${newForm.uniqueLink}`;
+
+    const html = `${message}. \n Please fill the form at ${url} \n Thank You`
+
+    await sendMail(emailAddresses,subject,html)
+
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+
+// share the form via unique link
+export const createLink = handleAsync(
+  async (req, res) => {
+    
+    // get the form id from the url
+    const formId = req.params.formId;
+
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(formId);
+
+    const url = `${process.env.CLIENT_URL}/form/view/${newForm.uniqueLink}`;
+
+    res.status(200).json({
+      success: true,
+      url,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// responce of all questions
+export const getAllResponses = handleAsync(
+  async (req, res) => {
+    
+    // get the form id from the url
+    const formId = req.params.formId;
+
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(formId);
+
+    const url = `${process.env.CLIENT_URL}/form/view/${newForm.uniqueLink}`;
+
+    res.status(200).json({
+      success: true,
+      url,
     });
   },
   (err, req, res, next) => next(err)

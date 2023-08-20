@@ -124,6 +124,7 @@ const formSchema = new Schema(
         default: true,
       },
     },
+    uniqueLink:String,
   },
   { timestamps: true }
 );

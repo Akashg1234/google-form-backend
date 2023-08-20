@@ -140,6 +140,7 @@ const questionSchema = new Schema(
           type: Schema.Types.Mixed,
         },
       ],
+      responces:[]
     },
   },
   { timestamps: true }
