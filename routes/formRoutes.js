@@ -3,8 +3,8 @@ import {
   isAuthenticated,
   isResponcer,
   isEditor,
-} from "../middlewares/authentication";
-import { upload } from "../middlewares/imageUploadToFile";
+} from "../middlewares/authentication.js";
+import { upload } from "../middlewares/imageUploadToFile.js";
 const formRoute = Router();
 
 formRoute.get('/all-forms',isAuthenticated,isEditor)

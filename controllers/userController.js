@@ -1,5 +1,6 @@
 import handleAsync from "async-error-handler";
-import { userModel } from "../DB/userModel";
+import { userModel } from "../DB/userModel.js";
+import { sendAllToken } from "../utils/jsonWebTokenHandler.js";
 
 export const handleUserRegister = handleAsync(async (req, res) => {
     const { email, password } = req.body;
@@ -9,13 +10,10 @@ export const handleUserRegister = handleAsync(async (req, res) => {
       errorThrow("User Allready Exist", 409, "Missing document");
     }
     else {
- user = await userModel.create({ email, password });
-res.status(201).json({ success: true, user, token });
+      user = await userModel.create({ email, password });
+      sendAllToken(user, "User Registered", res, 201)
     }
   
-  // res.redirect("/login");
-  // res.send("User Registered");
-
 },(err,req,res,next)=>next(err))
 
 export const handleUserLogin = handleAsync(

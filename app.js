@@ -1,5 +1,5 @@
 import express from 'express';
-import { userRouter } from './routes/useRoutes.js';
+import { userRouter } from './routes/userRoutes.js';
 import cookieParser from 'cookie-parser';
 import { ErrorHandler, ErrorLogger } from './utils/errorHandler.js';
 import cors from 'cors'

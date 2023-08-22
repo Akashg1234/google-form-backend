@@ -1,5 +1,5 @@
-import { Schema,model } from "./dbUtils";
-import bcrypt from "bcryptjs";
+import { Schema,model } from "./dbUtils.js";
+import bcrypt from "bcrypt";
 import { randomBytes, createHash } from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -13,14 +13,10 @@ const userSchema = new Schema(
     },
     avatar: {
       public_id: {
-        type: "String",
-        required: true,
-        default: "public_id",
+        type: String
       },
       url: {
-        type: "String",
-        required: true,
-        default: "url",
+        type: String
       },
     },
 

@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import { errorThrow } from "../utils/errorHandler.js";
 import handleAsync from "async-error-handler";
 import { userModel } from "../DB/userModel.js";
-import * as next from 'next';
 import { formModel } from "../DB/formModel.js";
 
 export const isAuthenticated = handleAsync(
