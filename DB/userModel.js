@@ -13,10 +13,11 @@ const userSchema = new Schema(
     },
     avatar: {
       public_id: {
-        type: String
+        type: String,
       },
       url: {
-        type: String
+        type: String,
+        default: "https://img.freepik.com/free-icon/user_318-159711.jpg",
       },
     },
 
@@ -26,10 +27,12 @@ const userSchema = new Schema(
       minLength: [8, "Password should be atleast 8 charecter long"],
       select: false,
     },
-    formsCreated: [{
-      ref: "Form",
-      type: Schema.Types.ObjectId,
-    }],
+    formsCreated: [
+      {
+        ref: "Form",
+        type: Schema.Types.ObjectId,
+      },
+    ],
     ResetPasswordToken: String,
     ResetPasswordExpire: Date,
   },

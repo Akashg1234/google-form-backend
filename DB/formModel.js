@@ -28,8 +28,8 @@ const formSchema = new Schema(
         default: "Form heading",
       },
       font: {
-        type: String,
-        default: "Arial",
+        text: { type: String, default: "Arial" },
+
         style: {
           bold: { type: Boolean, default: false },
           italic: { type: Boolean, default: false },
@@ -42,10 +42,8 @@ const formSchema = new Schema(
       },
     },
     question: {
-     
       font: {
-        type: String,
-        default: "Arial",
+        text: { type: String, default: "Arial" },
         style: {
           bold: { type: Boolean, default: false },
           italic: { type: Boolean, default: false },
@@ -124,7 +122,7 @@ const formSchema = new Schema(
         default: true,
       },
     },
-    uniqueLink:String,
+    uniqueLink: String,
   },
   { timestamps: true }
 );

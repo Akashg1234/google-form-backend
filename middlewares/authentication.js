@@ -7,11 +7,11 @@ import { formModel } from "../DB/formModel.js";
 export const isAuthenticated = handleAsync(
   async (req, res, next) => {
     // get the jwt token from the cookie
-    let decodedData = null;
+    // console.log(req);
+    const {login_token} = req.cookies;
 
     if (
-      !req.headers.authorization &&
-      !req.headers.authorization.startsWith("Bearer")
+      !login_token
     ) {
       // throw the error to login the resource
       errorThrow(
@@ -20,11 +20,12 @@ export const isAuthenticated = handleAsync(
         "Permission denied"
       );
     } else {
-      const login_token = req.headers.authorization.split(" ")[1];
+      // login_token = req.headers.authorization.split(" ")[1];
       // verify the token and decode the data
-      decodedData = jwt.verify(login_token, process.env.JWT_SECRET_KEY);
+      const decodedData = jwt.verify(login_token, process.env.JWT_SECRET_KEY);
+      // console.log(decodedData);
       // get the user from the database
-      req.user = await userModel.findById(decodedData.jwt_id);
+      req.user=await userModel.findById(decodedData.jwt_user_id);
       next();
     }
   },

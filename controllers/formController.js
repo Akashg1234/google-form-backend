@@ -1,9 +1,23 @@
 import handleAsync from "async-error-handler"
-import { formModel } from "../DB/formModel";
-import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile";
-import { sendMail } from "../utils/sendEmail";
+import { formModel } from "../DB/formModel.js";
+import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile.js";
+import { sendMail } from "../utils/sendEmail.js";
 import {createHash} from 'crypto'
+import { errorThrow } from "../utils/errorHandler.js";
 
+// delete the form of 
+export const getAllFormOfTheOwner = handleAsync(
+  async (req, res) => {
+    // console.log(req.user);
+    const allForm = await formModel.find({ creator :req.user._id});
+// console.log(allForm);
+    res.status(200).json({
+      success: true,
+      allForm,
+    });
+},
+  (err, req, res, next) => next(err)
+)
 export const handleUserFormCreation = handleAsync(
   async (req, res) => {
     const {formTitle,formHeadingText} = req.body;
@@ -13,7 +27,7 @@ export const handleUserFormCreation = handleAsync(
     const uniqueLink = createHash('sha256').update(hashSecret).digest('hex')
 
     const newForm = await formModel.create({
-      creator: req.body,
+      creator: req.user._id,
       formTitle: formTitle,
       header: { formHeadingText: formHeadingText },
       uniqueLink: uniqueLink,
@@ -34,6 +48,10 @@ export const deleteTheForm = handleAsync(
     const formId = req.params.formId;
     const deletedForm = await formModel.findByIdAndDelete(formId);
 
+    if(!deletedForm){
+      errorThrow("Form not found",404,"Missing document")
+    }
+
     res.status(200).json({
       success: true,
       deletedForm,
@@ -48,11 +66,15 @@ export const getTheForm = handleAsync(
   async (req, res) => {
     // get the form id from the url
     const formId = req.params.formId;
-    const deletedForm = await formModel.findByIdAndDelete(formId);
+    const theForm = await formModel.findById(formId);
+
+    if(!theForm){
+      errorThrow("Form not found", 404, "Missing document");
+    }
 
     res.status(200).json({
       success: true,
-      deletedForm,
+      theForm,
     });
   },
   (err, req, res, next) => next(err)
@@ -69,6 +91,10 @@ const formId = req.params.formId;
     const newForm = await formModel.findByIdAndUpdate(formId,{
       formTitle: formTitle,
     },{new:true});
+
+    if(!newForm){
+      errorThrow("Form not found",404,"Missing document")
+    }
 
     res.status(200).json({
       success: true,
@@ -117,6 +143,9 @@ export const updateFormHeaderImage = handleAsync(
 
     // find the form by id and update the form title
     const newForm = await formModel.findById(formId)
+    if(!newForm){
+      errorThrow("Form not found", 404, "Missing document");
+    }
     // delete the old file from the cloudinary
     await fileDeleteFromCloudinary(newForm.headerImage.public_id)
     // upload file to the cloudinary
@@ -145,16 +174,16 @@ export const updateFormHeaderFont = handleAsync(
     const formId = req.params.formId;
     
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        header: {
-          font:formHeadingFont,
-        },
-      },
-      { new: true }
-    );
+    const newForm = await formModel.findById(formId)
 
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+      
+    newForm.header.font.text = formHeadingFont;
+
+    await newForm.save()
+      
     res.status(200).json({
       success: true,
       newForm,
@@ -172,17 +201,16 @@ export const updateFormHeaderFontSize = handleAsync(
     const formId = req.params.formId;
 
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        header: {
-          font: {
-            size: Number(formHeadingFontSize),
-          },
-        },
-      },
-      { new: true }
-    );
+    const newForm = await formModel.findById(formId)
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    
+    newForm.header.font.size = Number(formHeadingFontSize)
+      
+    await newForm.save();
+     
 
     res.status(200).json({
       success: true,
@@ -201,13 +229,15 @@ export const updateFormFont = handleAsync(
     const formId = req.params.formId;
 
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        textFont: formFont,
-      },
-      { new: true }
-    );
+    const newForm = await formModel.findById(formId)
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+      
+    newForm.textFont=formFont
+    
+    await newForm.save()
 
     res.status(200).json({
       success: true,
@@ -226,13 +256,15 @@ export const updateFormFontSize = handleAsync(
     const formId = req.params.formId;
 
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        textFontSize: Number(formFontSize),
-      },
-      { new: true }
-    );
+    const newForm = await formModel.findById(formId)
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+      
+    newForm.textFontSize= Number(formFontSize),
+      
+    await newForm.save()
 
     res.status(200).json({
       success: true,
@@ -251,17 +283,15 @@ export const updateQuestionFontSize = handleAsync(
     const formId = req.params.formId;
 
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        question: {
-            font:{
-                size:Number(formQuestionFontSize)
-            }
-        },
-      },
-      { new: true }
-    );
+    const newForm = await formModel.findById(formId);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+
+    newForm.question.font.size = Number(formQuestionFontSize);
+
+    await newForm.save();
 
     res.status(200).json({
       success: true,
@@ -280,16 +310,16 @@ export const updateQuestionFont = handleAsync(
     const formId = req.params.formId;
 
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        question: {
-          font: formQuestionFont,
-        },
-      },
-      { new: true }
-    );
+    const newForm = await formModel.findById(formId)
 
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+      
+    newForm.question.font.text = formQuestionFont
+
+    await newForm.save()
+        
     res.status(200).json({
       success: true,
       newForm,
@@ -308,6 +338,10 @@ export const shareFormViaEmails = handleAsync(
 
     // find the form by id and update the form title
     const newForm = await formModel.findById(formId);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
 
     const url = `${process.env.CLIENT_URL}/form/${newForm.uniqueLink}`;
 
@@ -334,6 +368,10 @@ export const createLink = handleAsync(
     // find the form by id and update the form title
     const newForm = await formModel.findById(formId);
 
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+
     const url = `${process.env.CLIENT_URL}/form/view/${newForm.uniqueLink}`;
 
     res.status(200).json({
@@ -353,6 +391,10 @@ export const getAllResponses = handleAsync(
 
     // find the form by id and update the form title
     const newForm = await formModel.findById(formId);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
 
     const url = `${process.env.CLIENT_URL}/form/view/${newForm.uniqueLink}`;
 
