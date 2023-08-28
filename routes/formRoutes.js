@@ -17,6 +17,7 @@ import {
   updateQuestionFont,
   updateQuestionFontSize,
   deleteTheForm,
+  shareFormViaEmails,
 } from "../controllers/formController.js";
 const formRoute = Router();
 
@@ -66,6 +67,13 @@ formRoute.put(
   isAuthenticated,
   isEditor,
   updateQuestionFontSize
+);
+
+formRoute.post(
+  "/edit-form/send-form-via-email/:formId",
+  isAuthenticated,
+  isEditor,
+  shareFormViaEmails
 );
 
 formRoute.get(

@@ -4,27 +4,28 @@ import {
   createTransport,
   getTestMessageUrl,
 } from "nodemailer";
-
+import { errorThrow } from "./errorHandler.js";
 
 export const sendMail = handleAsync(
   async (data, req, res, next) => {
     let testAccount = await createTestAccount();
 
-    // create reusable transporter object using the default SMTP transport
+    // Create a SMTP transporter object
     let transporter = createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false, // true for 465, false for other ports
+      host: testAccount.smtp.host,
+      port: testAccount.smtp.port,
+      secure: testAccount.smtp.secure,
       auth: {
-        user: process.env.NODE_MAILER_USER, // generated ethereal user
-        pass: process.env.NODE_MAILER_PASS, // generated ethereal password
+        user: testAccount.user,
+        pass: testAccount.pass,
       },
     });
+
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
       from: '"Fred Foo 👻" <foo@gamil.com>', // sender address
-      to: data.emailAddresses, // list of receivers
+      to: data.to, // list of receivers
       subject: data.subject, // Subject line
       html: data.html, // html body
     });

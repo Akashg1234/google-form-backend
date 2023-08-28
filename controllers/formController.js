@@ -345,9 +345,26 @@ export const shareFormViaEmails = handleAsync(
 
     const url = `${process.env.CLIENT_URL}/form/${newForm.uniqueLink}`;
 
-    const html = `${message}. \n Please fill the form at ${url} \n Thank You`
+    const html = `<b>Hi there!</b>
+                    <br>
+                        <i>
+                        <br>${message}. <br><br>
+                        </i> \n Please fill the form at 
+                        <a href="${url} "> Form Link </a> <br><br>
+                        <i>
+                        <br>
+                        Regards,
+                        <br>
+                        <b>Team<b>
+                        </i> \n Thank You`;
 
-    await sendMail(emailAddresses,subject,html)
+    const data={
+      subject:subject,
+      to:emailAddresses,
+      html:html
+    }
+
+    await sendMail(data)
 
     res.status(200).json({
       success: true,

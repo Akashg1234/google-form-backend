@@ -38,6 +38,9 @@ export const isResponcer = handleAsync(
   async (req, res, next) => {
     const formId = req.params.formId;
     const form = await formModel.findById(formId);
+    if (!form) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
     if (req.user._id.toString() !== form.creator.toString()) {
       next()
       
@@ -59,6 +62,11 @@ export const isEditor = handleAsync(
   async (req,res,next) => {
     const formId = req.params.formId;
     const form = await formModel.findById(formId);
+
+    if(!form){
+      errorThrow("Form not found",404,"Missing document")
+    
+    }
     if (req.user._id.toString() === form.creator.toString()) {
       next();
     }
