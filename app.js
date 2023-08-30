@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import { ErrorHandler, ErrorLogger } from './utils/errorHandler.js';
 import cors from 'cors'
 import { formRoute } from './routes/formRoutes.js';
+import { cloudinaryConfig } from './middlewares/imageUploadToFile.js';
+import { questionRoute } from './routes/questionRoutes.js';
 
 const app = express();
 
@@ -17,9 +19,10 @@ app.use(
     
   })
 );
-
+app.use("/*", cloudinaryConfig);
 app.use('/user',userRouter)
 app.use('/form',formRoute)
+app.use('/question',questionRoute)
 
 app.use([ErrorLogger,ErrorHandler])
 

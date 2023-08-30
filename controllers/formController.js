@@ -1,9 +1,10 @@
 import handleAsync from "async-error-handler"
 import { formModel } from "../DB/formModel.js";
-import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile.js";
+import { dataUri, fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile.js";
 import { sendMail } from "../utils/sendEmail.js";
 import {createHash} from 'crypto'
 import { errorThrow } from "../utils/errorHandler.js";
+import { v2 as cloudinary } from "cloudinary";
 
 // delete the form of 
 export const getAllFormOfTheOwner = handleAsync(
@@ -103,41 +104,56 @@ const formId = req.params.formId;
   },
   (err, req, res, next) => next(err)
 );
-
+// bug should be fixed
 // add form header image
 export const addFormHeaderImage = handleAsync(
   async (req, res) => {
-    // get the form title from the request body
-    const file = req.files;
+    console.log(req.params.formId, "----", req.file.headerImage);
     // get the form id from the url
     const formId = req.params.formId;
-    // upload file to the cloudinary
-    const myCloud = await fileUploadToCloudinary(file.path)
     // find the form by id and update the form title
-    const newForm = await formModel.findByIdAndUpdate(
-      formId,
-      {
-        headerImage: {
-          public_id:myCloud.public_id,
-          url: myCloud.secure_url,
-        },
-      },
-      { new: true }
-    );
+    let newForm = await formModel.findById(formId);
+console.log(newForm);
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // get the form title from the request body
+    if (req.file) {
+      const file = dataUri(req).content;
+      // console.log(file);
+      // upload file to the cloudinary
+      const uploadResult = await cloudinary.uploader.upload(file);
 
-    res.status(200).json({
-      success: true,
-      newForm,
-    });
+      console.log("upload result: ", uploadResult);
+
+      if (!uploadResult) {
+        errorThrow("Error in file upload", 400, "Internal or server error");
+      } else {
+        newForm.headerImage.public_id = uploadResult.public_id;
+        newForm.headerImage.url = uploadResult.secure_url;
+
+        await newForm.save();
+
+        res.status(200).json({
+          success: true,
+          message: "Image has been uploaded succesfully",
+          newForm,
+        });
+      }
+    }
+    else{
+      errorThrow("File not found", 404, "Missing error");
+    }
+   
   },
   (err, req, res, next) => next(err)
 );
-
+// bug should be fixed
 // update form header image
 export const updateFormHeaderImage = handleAsync(
   async (req, res) => {
     // get the form title from the request body
-    const file = req.files;
+    const file = req.file;
     // get the form id from the url
     const formId = req.params.formId;
 
@@ -355,8 +371,9 @@ export const shareFormViaEmails = handleAsync(
                         <br>
                         Regards,
                         <br>
-                        <b>Team<b>
-                        </i> \n Thank You`;
+                        <b>Ishan</b>
+                        <br>
+                        </i> Thank You`;
 
     const data={
       subject:subject,
@@ -368,7 +385,7 @@ export const shareFormViaEmails = handleAsync(
 
     res.status(200).json({
       success: true,
-      newForm,
+      message: "Email sent successfully",
     });
   },
   (err, req, res, next) => next(err)
@@ -389,7 +406,7 @@ export const createLink = handleAsync(
       errorThrow("Form not found", 404, "Missing document");
     }
 
-    const url = `${process.env.CLIENT_URL}/form/view/${newForm.uniqueLink}`;
+    const url = `${process.env.FRONT_END_URL}/form/view/${newForm.uniqueLink}`;
 
     res.status(200).json({
       success: true,

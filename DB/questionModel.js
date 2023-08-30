@@ -3,8 +3,7 @@ import { Schema, model } from "mongoose";
 const questionSchema = new Schema(
   {
     questionTitle: {
-      type: String,
-      default: "Untitled question",
+      text: { type: String, default: "Untitled question" },
       style: {
         bold: { type: Boolean, default: false },
         italic: { type: Boolean, default: false },
@@ -40,7 +39,7 @@ const questionSchema = new Schema(
     videoOfTheQuestion: {
       left: {
         type: Boolean,
-        default:true
+        default: true,
       },
       right: {
         type: Boolean,
@@ -50,7 +49,6 @@ const questionSchema = new Schema(
       },
       url: {
         type: String,
-
       },
       caption: {
         type: String,
@@ -70,7 +68,7 @@ const questionSchema = new Schema(
           enum: ["pdf", "doc", "docx", "jpg", "png", "jpeg"],
         },
       ],
-      
+
       // maximum size of the file
       fileSize: {
         type: Number,
@@ -140,7 +138,11 @@ const questionSchema = new Schema(
           type: Schema.Types.Mixed,
         },
       ],
-      responces:[]
+      responces: [
+        {
+          type: String,
+        },
+      ],
     },
   },
   { timestamps: true }

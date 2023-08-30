@@ -18,7 +18,10 @@ import {
   updateQuestionFontSize,
   deleteTheForm,
   shareFormViaEmails,
+  updateFormHeaderImage,
+  createLink,
 } from "../controllers/formController.js";
+
 const formRoute = Router();
 
 formRoute.get('/all-forms',isAuthenticated,getAllFormOfTheOwner)
@@ -77,11 +80,27 @@ formRoute.post(
 );
 
 formRoute.get(
-  "/add-image-header/:formId",
-  upload.single("headerImage"),
+  "/edit-form/create-form-link/:formId",
   isAuthenticated,
   isEditor,
+  createLink
+);
+
+// TODO
+formRoute.post(
+  "/add-image-header/:formId",
+  isAuthenticated,
+  isEditor,
+  upload.single("headerImage"),
   addFormHeaderImage
+);
+// TODO
+formRoute.put(
+  "/update-image-header/:formId",
+  isAuthenticated,
+  isEditor,
+  upload.single("headerImage"),
+  updateFormHeaderImage
 );
 
 export { formRoute };
