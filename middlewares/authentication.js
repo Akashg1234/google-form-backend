@@ -68,6 +68,7 @@ export const isEditor = handleAsync(
     
     }
     if (req.user._id.toString() === form.creator.toString()) {
+      req.form = form;
       next();
     }
     else{

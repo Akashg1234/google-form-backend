@@ -439,3 +439,26 @@ export const getAllResponses = handleAsync(
   },
   (err, req, res, next) => next(err)
 );
+
+// responce of all questions
+export const setQuestionSuffelHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question suffle
+    newForm.settings.isSuffled = req.body.questionSuffle;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);

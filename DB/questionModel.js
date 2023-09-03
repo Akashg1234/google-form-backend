@@ -82,22 +82,28 @@ const questionSchema = new Schema(
     typeOfAnsField: {
       shortAnswer: {
         type: Boolean,
+        default: false,
       },
       pargraphAnswer: {
         type: Boolean,
+        default: false,
       },
       mcq: {
         type: Boolean,
+        default: true,
       },
       mcqGrid: {
         type: Boolean,
+        default: false,
       },
       checkBox: {
         type: Boolean,
+        default: false,
       },
 
       dropDown: {
         type: Boolean,
+        default: false,
       },
     },
     // is this question required to be answered
@@ -129,13 +135,13 @@ const questionSchema = new Schema(
       // the given answer options/option
       givenAnswerOptions: [
         {
-          type: Schema.Types.Mixed,
+          type: String,
         },
       ],
       // the correct answer options/option
       correctAnswerOptions: [
         {
-          type: Schema.Types.Mixed,
+          type: String,
         },
       ],
       responces: [

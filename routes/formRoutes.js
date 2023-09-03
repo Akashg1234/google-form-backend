@@ -20,6 +20,7 @@ import {
   shareFormViaEmails,
   updateFormHeaderImage,
   createLink,
+  setQuestionSuffelHandler,
 } from "../controllers/formController.js";
 
 const formRoute = Router();
@@ -86,6 +87,12 @@ formRoute.get(
   createLink
 );
 
+formRoute.put(
+  "/set-form-question-suffel/:formId",
+  isAuthenticated,
+  isEditor,
+  setQuestionSuffelHandler
+);
 // TODO
 formRoute.post(
   "/add-image-header/:formId",

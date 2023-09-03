@@ -1,8 +1,8 @@
 import handleAsync from "async-error-handler";
-import { questionModel } from "../DB/questionModel";
-import { formModel } from "../DB/formModel";
-import { errorThrow } from "../utils/errorHandler";
-import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile";
+import { questionModel } from "../DB/questionModel.js";
+import { formModel } from "../DB/formModel.js";
+import { errorThrow } from "../utils/errorHandler.js";
+import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile.js";
 import {URL} from 'url'
 
 const checkUrl=(givenUrl)=>{
@@ -15,17 +15,77 @@ const checkUrl=(givenUrl)=>{
 
 }
 export const createQuestion= handleAsync(async (req, res) => {
-    const { questionTitle, typeOfAnsField, givenAnswerOptions } = req.body;
-    const newQuestion = await questionModel.create({
-      questionTitle: questionTitle,
-      typeOfAnsField: typeOfAnsField,
-      givenAnswerOptions: givenAnswerOptions,
-    
-    });
-    res.status(201).json({
-        success:true,
-        newQuestion
-    })
+  const { questionTitle, typeOfAnsField, givenAnswerOptions } = req.body;
+  
+  const newQuestion = await questionModel.create({
+    questionTitle: { text: questionTitle }
+  });
+
+  if(typeOfAnsField==='Short Answer'){
+    newQuestion.typeOfAnsField.shortAnswer = true;
+  newQuestion.typeOfAnsField.pargraphAnswer = false;
+  newQuestion.typeOfAnsField.mcq = false;
+  newQuestion.typeOfAnsField.mcqGrid = false;
+  newQuestion.typeOfAnsField.checkBox = false;
+  newQuestion.typeOfAnsField.dropDown = false;
+    }
+    else if(typeOfAnsField==='Long Answer'){
+      newQuestion.typeOfAnsField.pargraphAnswer = true;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    }
+    else if(typeOfAnsField==='Multiple Choice'){
+      newQuestion.typeOfAnsField.mcq = true;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    }
+    else if(typeOfAnsField==='Multiple Choice Grid'){
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = true;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    }
+    else if(typeOfAnsField==='Checkbox'){
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = true;
+      newQuestion.typeOfAnsField.dropDown = false;
+    }
+    else if(typeOfAnsField==='Drop Down'){
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = true;
+    }
+  
+    newQuestion.answer.givenAnswerOptions.push(givenAnswerOptions);
+
+    await newQuestion.save()
+  
+  // find the form to pull the question id
+  const newForm = await formModel.findById(req.form._id);
+  // pull out the question id from the array of questions of the given form
+  newForm.questions.push(newQuestion._id);
+
+  await newForm.save();
+
+  res.status(201).json({
+    success: true,
+    newForm,
+    newQuestion,
+  });
 },(err,req,res,next)=>next(err))
 
 // make is required or not required
@@ -34,26 +94,21 @@ export const deleteQuestion = handleAsync(
   async (req, res) => {
 // get the questionid , which will be deleted
     const questionId = req.params.questionId;
-    // get formid,from which the question will be deleted
-    const formId = req.params.formId;
+   
+    const deletedQuestion = await questionModel.findByIdAndDelete(questionId);
 
-    const newQuestion = await questionModel.findByIdAndDelete({
-        questionId
-    });
-
-    await newQuestion.save();
+    // await newQuestion.save();
 // find the form to pull the question id
-    const newForm =await formModel.findById(
-      { formId }
-    );
+    const newForm =await formModel.findById(req.form._id );
 // pull out the question id from the array of questions of the given form
-    newForm.questions.pull(questionId);
+    newForm.questions.pull(deletedQuestion._id);
 
     await newForm.save();
 
     res.status(200).json({
       success: true,
-      newQuestion,
+      deletedQuestion,
+      newForm
     });
   },
   (err, req, res, next) => next(err)
@@ -62,15 +117,23 @@ export const deleteQuestion = handleAsync(
 export const updateQuestionTitle = handleAsync(
   async (req, res) => {
     // get new question title from the body
-    const { questionTitle} = req.body;
-    // get the questionId from the params
+    const { questionTitle } = req.body;
+
+    // get the questionid , which will be update
     const questionId = req.params.questionId;
+
     // find the question and update it with the new title and return the new document
-    
-    const newQuestion = await questionModel.findByIdAndUpdate({
-      questionId},{
-      questionTitle: questionTitle,
-    },{new:true});
+
+    const newQuestion = await questionModel.findById(questionId)
+
+    if(!newQuestion){
+      errorThrow("Question not found",404,"Missing document")
+    }
+
+    newQuestion.questionTitle.text=questionTitle;
+
+    await newQuestion.save();
+
     res.status(200).json({
       success: true,
       newQuestion,
@@ -82,19 +145,62 @@ export const updateQuestionTitle = handleAsync(
 export const updateTypesOfQuestion = handleAsync(
   async (req, res) => {
     // get new question title from the body
-    const { questionType } = req.body;
+    const { typeOfAnsField } = req.body;
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    const newQuestion = await questionModel.findByIdAndUpdate(
-      {
-        questionId,
-      },
-      {
-        typeOfAnsField: questionType,
-      },
-      { new: true }
-    );
+    const newQuestion = await questionModel.findById(questionId);
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    
+    }
+
+    if (typeOfAnsField === "Short Answer") {
+      newQuestion.typeOfAnsField.shortAnswer = true;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    } else if (typeOfAnsField === "Long Answer") {
+      newQuestion.typeOfAnsField.pargraphAnswer = true;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    } else if (typeOfAnsField === "Multiple Choice") {
+      newQuestion.typeOfAnsField.mcq = true;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    } else if (typeOfAnsField === "Multiple Choice Grid") {
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = true;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = false;
+    } else if (typeOfAnsField === "Checkbox") {
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = true;
+      newQuestion.typeOfAnsField.dropDown = false;
+    } else if (typeOfAnsField === "Drop Down") {
+      newQuestion.typeOfAnsField.mcq = false;
+      newQuestion.typeOfAnsField.pargraphAnswer = false;
+      newQuestion.typeOfAnsField.shortAnswer = false;
+      newQuestion.typeOfAnsField.mcqGrid = false;
+      newQuestion.typeOfAnsField.checkBox = false;
+      newQuestion.typeOfAnsField.dropDown = true;
+    }
+
+    await newQuestion.save();
+
     res.status(200).json({
       success: true,
       newQuestion,
@@ -110,9 +216,9 @@ export const addMultipleAnswer = handleAsync(
     // get the questionId from the params
     const questionId = req.params.questionId;
     // find the form to pull the question id
-    const newQuestion = await questionModel.findById({
+    const newQuestion = await questionModel.findById(
       questionId,
-    });
+    );
 
     newQuestion.answer.givenAnswerOptions.push(ansOption);
 
@@ -226,9 +332,7 @@ export const addImageCaptionToQuestion = handleAsync(
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    let newQuestion = await questionModel.findById({
-      questionId,
-    });
+    let newQuestion = await questionModel.findById(questionId);
     if (!newQuestion) {
       errorThrow("Question not found", 404, "Missing document");
     }
@@ -252,15 +356,14 @@ export const deleteImageCaptionToQuestion = handleAsync(
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    let newQuestion = await questionModel.findById({
-      questionId,
-    });
+    let newQuestion = await questionModel.findById(questionId)
+    // check if the question is found
     if (!newQuestion) {
       errorThrow("Question not found", 404, "Missing document");
     }
-
+    // delete the image caption to the questio
     newQuestion.imageOfTheQuestion.caption = undefined;
-
+    // save it to the database
     await newQuestion.save();
 
     res.status(200).json({
@@ -274,13 +377,12 @@ export const deleteImageCaptionToQuestion = handleAsync(
 // update the image alignment to the question
 export const updateImageAllignmentToQuestion = handleAsync(
   async (req, res) => {
+
     const imageAlignment = req.body.imageAlignment;
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    let newQuestion = await questionModel.findById({
-      questionId,
-    });
+    let newQuestion = await questionModel.findById(questionId);
 
     if (!newQuestion) {
       errorThrow("Question not found", 404, "Missing document");
@@ -288,14 +390,18 @@ export const updateImageAllignmentToQuestion = handleAsync(
 
     if(imageAlignment === "left"){
       newQuestion.imageOfTheQuestion.left = true;
+      newQuestion.imageOfTheQuestion.right = false;
+      newQuestion.imageOfTheQuestion.center = false;
     }
     else if(imageAlignment === "right"){
       newQuestion.imageOfTheQuestion.right = true;
-    
+    newQuestion.imageOfTheQuestion.center = false;
+    newQuestion.imageOfTheQuestion.left = false;
     }
     else if(imageAlignment === "center"){
       newQuestion.imageOfTheQuestion.center = true;
-    
+    newQuestion.imageOfTheQuestion.right = false;
+    newQuestion.imageOfTheQuestion.left = false;
     }
 
     await newQuestion.save();
@@ -345,10 +451,8 @@ export const deleteVideoCaptionToQuestion = handleAsync(
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    let newQuestion = await questionModel.findById({
-      questionId,
-    });
-
+    let newQuestion = await questionModel.findById(questionId);
+    // check if the question is found
     if (!newQuestion) {
       errorThrow("Question not found", 404, "Missing document");
     }
@@ -393,7 +497,6 @@ export const addVideoToQuestion = handleAsync(
 );
 
 
-
 // delete the video which is associated with the question
 
 export const deleteVideoToQuestion = handleAsync(
@@ -429,9 +532,7 @@ export const updateVideoAllignmentToQuestion = handleAsync(
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    let newQuestion = await questionModel.findById({
-      questionId,
-    });
+    let newQuestion = await questionModel.findById(questionId);
 
     if (!newQuestion) {
       errorThrow("Question not found", 404, "Missing document");
@@ -439,15 +540,114 @@ export const updateVideoAllignmentToQuestion = handleAsync(
 
     if(videoAlignment === "left"){
       newQuestion.videoOfTheQuestion.left = true;
+      newQuestion.videoOfTheQuestion.right = false;
+      newQuestion.videoOfTheQuestion.center = false;
     }
     else if(videoAlignment === "right"){
       newQuestion.videoOfTheQuestion.right = true;
-    
+    newQuestion.videoOfTheQuestion.center = false;
+    newQuestion.videoOfTheQuestion.left = false;
     }
     else if(videoAlignment === "center"){
-      newQuestion.videoOfTheQuestion.center = true;
-    
+    newQuestion.videoOfTheQuestion.center = true;
+    newQuestion.videoOfTheQuestion.right = false;
+    newQuestion.videoOfTheQuestion.left = false;
     }
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// answer suffel handler
+export const setAnswerSuffelHandler = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set answer options to suffel or not suffel
+    newQuestion.answer.suffelOptionOrder = req.body.suffelOptionOrder;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// answer suffel handler
+export const addCorrectAnswer = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set answer options to suffel or not suffel
+    newQuestion.answer.correctAnswerOptions.push(req.body.correctAnswerOptions);
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// answer suffel handler
+export const addShortAnswer = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.answer.shortAnswer = req.body.shortAnswer
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// answer suffel handler
+export const addParagraphAnswer = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.answer.pargraphAnswer = req.body.pargraphAnswer
 
     await newQuestion.save();
 

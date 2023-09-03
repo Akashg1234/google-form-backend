@@ -17,5 +17,6 @@ dataBaseConnection().then(()=>{
     );
   });
 }).catch((err)=>{
-  console.log(chalk.bold(chalk.redBright(err.message)));
+  console.log(chalk.bold(chalk.redBright(` ERROR :: ${err.message}`)));
+  process.exit(1)
 })
