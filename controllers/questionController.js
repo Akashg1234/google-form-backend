@@ -658,3 +658,222 @@ export const addParagraphAnswer = handleAsync(
   },
   (err, req, res, next) => next(err)
 );
+
+// answer mandate handler
+export const setQuestionIsRequired = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.required = req.body.required;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+//question title style bold handler
+export const setQuestionTitleStyleBoldHandler = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.questionTitle.style.bold = req.body.bold;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+//question title style italic handler
+export const setQuestionTitleStyleItalicHandler = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.questionTitle.style.italic = req.body.italic;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+//question title style underline handler
+export const setQuestionTitleStyleUnderlineHandler = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.questionTitle.style.underline = req.body.underline;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set answer file of the question
+export const setAllowedSpecificFileType = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.ansFileOfTheQuestion.isAllowedSpecificFileType =
+      req.body.isAllowedSpecificFileType;
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set answer typeOfTheFile of the question
+export const setSpecificFileType = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.ansFileOfTheQuestion.typeOfTheFile.push(req.body.typeOfTheFile);
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set answer typeOfTheFile of the question
+export const setFileSize = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.ansFileOfTheQuestion.fileSize = Number(req.body.fileSize);
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+
+// set answer typeOfTheFile of the question
+export const setNumberOfFiles = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.ansFileOfTheQuestion.numberOfFiles = Number(req.body.numberOfFiles);
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+
+// set responce of the question
+export const giveResponse = handleAsync(
+  async (req, res) => {
+    // get the questionId from the params
+    const questionId = req.params.questionId;
+
+    let newQuestion = await questionModel.findById(questionId);
+
+    if (!newQuestion) {
+      errorThrow("Question not found", 404, "Missing document");
+    }
+    // set short answer to the question
+    newQuestion.ansFileOfTheQuestion.numberOfFiles = Number(req.body.numberOfFiles);
+
+    await newQuestion.save();
+
+    res.status(200).json({
+      success: true,
+      newQuestion,
+    });
+  },
+  (err, req, res, next) => next(err)
+);

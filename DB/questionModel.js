@@ -109,6 +109,7 @@ const questionSchema = new Schema(
     // is this question required to be answered
     required: {
       type: Boolean,
+      default:false
     },
     // question font
     questionFont: {

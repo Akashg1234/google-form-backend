@@ -21,6 +21,9 @@ import {
   updateFormHeaderImage,
   createLink,
   setQuestionSuffelHandler,
+  setFormHeaderFontBoldStyleHandler,
+  setFormHeaderFontItalicStyleHandler,
+  setFormHeaderFontUnderlineStyleHandler,
 } from "../controllers/formController.js";
 
 const formRoute = Router();
@@ -92,6 +95,24 @@ formRoute.put(
   isAuthenticated,
   isEditor,
   setQuestionSuffelHandler
+);
+formRoute.put(
+  "/set-header-font-bold/:formId",
+  isAuthenticated,
+  isEditor,
+  setFormHeaderFontBoldStyleHandler
+);
+formRoute.put(
+  "/set-header-font-italic/:formId",
+  isAuthenticated,
+  isEditor,
+  setFormHeaderFontItalicStyleHandler
+);
+formRoute.put(
+  "/set-header-font-understand/:formId",
+  isAuthenticated,
+  isEditor,
+  setFormHeaderFontUnderlineStyleHandler
 );
 // TODO
 formRoute.post(

@@ -4,7 +4,7 @@ import {
   isResponcer,
   isEditor,
 } from "../middlewares/authentication.js";
-import { addCorrectAnswer, addImageCaptionToQuestion, addMultipleAnswer, addParagraphAnswer, addShortAnswer, createQuestion, deleteImageCaptionToQuestion, deleteQuestion, setAnswerSuffelHandler, updateImageAllignmentToQuestion, updateQuestionTitle, updateTypesOfQuestion, updateVideoAllignmentToQuestion } from "../controllers/questionController.js";
+import { addCorrectAnswer, addImageCaptionToQuestion, addMultipleAnswer, addParagraphAnswer, addShortAnswer, createQuestion, deleteImageCaptionToQuestion, deleteQuestion, setAllowedSpecificFileType, setAnswerSuffelHandler, setFileSize, setNumberOfFiles, setQuestionIsRequired, setQuestionTitleStyleBoldHandler, setQuestionTitleStyleItalicHandler, setQuestionTitleStyleUnderlineHandler, setSpecificFileType, updateImageAllignmentToQuestion, updateQuestionTitle, updateTypesOfQuestion, updateVideoAllignmentToQuestion } from "../controllers/questionController.js";
 
 export const questionRoute = Router();
 
@@ -86,3 +86,72 @@ questionRoute.put(
   isEditor,
   addParagraphAnswer
 );
+
+questionRoute.put(
+  "/set-answer-mandate/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setQuestionIsRequired
+);
+
+questionRoute.put(
+  "/set-question-title-style-bold/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setQuestionTitleStyleBoldHandler
+);
+
+questionRoute.put(
+  "/set-question-title-style-italic/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setQuestionTitleStyleItalicHandler
+);
+
+
+questionRoute.put(
+  "/set-question-title-style-underline/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setQuestionTitleStyleUnderlineHandler
+);
+
+
+questionRoute.put(
+  "/set-question-title-style-underline/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setQuestionTitleStyleUnderlineHandler
+);
+
+
+questionRoute.put(
+  "/set-required-specific-file-type/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setAllowedSpecificFileType
+);
+
+
+questionRoute.post(
+  "/set-specific-file-type/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setSpecificFileType
+);
+
+questionRoute.post(
+  "/set-file-size/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setFileSize
+);
+
+
+questionRoute.post(
+  "/set-number-of-files/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  setNumberOfFiles
+);
+

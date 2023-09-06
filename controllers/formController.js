@@ -462,3 +462,136 @@ export const setQuestionSuffelHandler = handleAsync(
   },
   (err, req, res, next) => next(err)
 );
+
+// set the header font style
+export const setFormHeaderFontBoldStyleHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question suffle
+    newForm.header.font.style.bold = req.body.bold;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header font style italic
+export const setFormHeaderFontItalicStyleHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question suffle
+    newForm.header.font.style.italic = req.body.italic;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header font style underline
+export const setFormHeaderFontUnderlineStyleHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question suffle
+    newForm.header.font.style.underline = req.body.underline;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header font style underline
+export const setFormQuestionFontUnderlineStyleHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question style
+    newForm.question.font.style.underline = req.body.underline;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header font style underline
+export const setFormQuestionFontBoldStyleHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question style
+    newForm.question.font.style.bold = req.body.bold;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header font style underline
+export const setFormQuestionFontItalicStyleHandler = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question style
+    newForm.question.font.style.italic = req.body.italic;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
