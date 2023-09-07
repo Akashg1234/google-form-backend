@@ -73,19 +73,6 @@ questionRoute.put(
   addCorrectAnswer
 );
 
-questionRoute.put(
-  "/give-short-ans/:formId/question/:questionId",
-  isAuthenticated,
-  isEditor,
-  addShortAnswer
-);
-
-questionRoute.put(
-  "/give-paragraph-ans/:formId/question/:questionId",
-  isAuthenticated,
-  isEditor,
-  addParagraphAnswer
-);
 
 questionRoute.put(
   "/set-answer-mandate/:formId/question/:questionId",

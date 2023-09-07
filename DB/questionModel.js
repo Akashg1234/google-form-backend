@@ -122,12 +122,6 @@ const questionSchema = new Schema(
       default: 16,
     },
     answer: {
-      shortAnswer: {
-        type: String,
-      },
-      pargraphAnswer: {
-        type: String,
-      },
       // suffel the option order of the answer option
       suffelOptionOrder: {
         type: Boolean,

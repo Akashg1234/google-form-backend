@@ -611,54 +611,6 @@ export const addCorrectAnswer = handleAsync(
   (err, req, res, next) => next(err)
 );
 
-// answer suffel handler
-export const addShortAnswer = handleAsync(
-  async (req, res) => {
-    // get the questionId from the params
-    const questionId = req.params.questionId;
-
-    let newQuestion = await questionModel.findById(questionId);
-
-    if (!newQuestion) {
-      errorThrow("Question not found", 404, "Missing document");
-    }
-    // set short answer to the question
-    newQuestion.answer.shortAnswer = req.body.shortAnswer
-
-    await newQuestion.save();
-
-    res.status(200).json({
-      success: true,
-      newQuestion,
-    });
-  },
-  (err, req, res, next) => next(err)
-);
-
-// answer suffel handler
-export const addParagraphAnswer = handleAsync(
-  async (req, res) => {
-    // get the questionId from the params
-    const questionId = req.params.questionId;
-
-    let newQuestion = await questionModel.findById(questionId);
-
-    if (!newQuestion) {
-      errorThrow("Question not found", 404, "Missing document");
-    }
-    // set short answer to the question
-    newQuestion.answer.pargraphAnswer = req.body.pargraphAnswer
-
-    await newQuestion.save();
-
-    res.status(200).json({
-      success: true,
-      newQuestion,
-    });
-  },
-  (err, req, res, next) => next(err)
-);
-
 // answer mandate handler
 export const setQuestionIsRequired = handleAsync(
   async (req, res) => {
@@ -866,7 +818,7 @@ export const giveResponse = handleAsync(
       errorThrow("Question not found", 404, "Missing document");
     }
     // set short answer to the question
-    newQuestion.ansFileOfTheQuestion.numberOfFiles = Number(req.body.numberOfFiles);
+    newQuestion.answer.responces.push(req.body.responces);
 
     await newQuestion.save();
 
