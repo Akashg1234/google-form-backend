@@ -1,10 +1,9 @@
 import handleAsync from "async-error-handler"
 import { formModel } from "../DB/formModel.js";
-import { dataUri, fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile.js";
+import { fileDeleteFromCloudinary, fileUploadToCloudinary } from "../middlewares/imageUploadToFile.js";
 import { sendMail } from "../utils/sendEmail.js";
 import {createHash} from 'crypto'
 import { errorThrow } from "../utils/errorHandler.js";
-import { v2 as cloudinary } from "cloudinary";
 
 // delete the form of 
 export const getAllFormOfTheOwner = handleAsync(
@@ -108,23 +107,23 @@ const formId = req.params.formId;
 // add form header image
 export const addFormHeaderImage = handleAsync(
   async (req, res) => {
-    console.log(req.params.formId, "----", req.file.headerImage);
+    
     // get the form id from the url
     const formId = req.params.formId;
     // find the form by id and update the form title
-    let newForm = await formModel.findById(formId);
-console.log(newForm);
+    let newForm = await formModel.findById(req.form._id);
+
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
     // get the form title from the request body
     if (req.file) {
-      const file = dataUri(req).content;
+      const file = req.file
       // console.log(file);
       // upload file to the cloudinary
-      const uploadResult = await cloudinary.uploader.upload(file);
+      const uploadResult = await fileUploadToCloudinary(file.path);
 
-      console.log("upload result: ", uploadResult);
+      // console.log("upload result: ", uploadResult);
 
       if (!uploadResult) {
         errorThrow("Error in file upload", 400, "Internal or server error");
@@ -136,7 +135,7 @@ console.log(newForm);
 
         res.status(200).json({
           success: true,
-          message: "Image has been uploaded succesfully",
+          // message: "Image has been uploaded succesfully",
           newForm,
         });
       }
@@ -148,17 +147,14 @@ console.log(newForm);
   },
   (err, req, res, next) => next(err)
 );
-// bug should be fixed
+
 // update form header image
 export const updateFormHeaderImage = handleAsync(
   async (req, res) => {
     // get the form title from the request body
     const file = req.file;
-    // get the form id from the url
-    const formId = req.params.formId;
-
     // find the form by id and update the form title
-    const newForm = await formModel.findById(formId)
+    const newForm = await formModel.findById(req.form._id)
     if(!newForm){
       errorThrow("Form not found", 404, "Missing document");
     }
@@ -169,6 +165,31 @@ export const updateFormHeaderImage = handleAsync(
     
     newForm.headerImage.public_id= myCloud.public_id
     newForm.headerImage.url= myCloud.secure_url
+    
+    await newForm.save()
+
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// update form header image
+export const deleteteFormHeaderImage = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id)
+    if(!newForm){
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // delete the old file from the cloudinary
+    await fileDeleteFromCloudinary(newForm.headerImage.public_id)
+    
+    newForm.headerImage.public_id= undefined;
+    newForm.headerImage.url= undefined;
     
     await newForm.save()
 

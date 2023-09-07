@@ -24,6 +24,7 @@ import {
   setFormHeaderFontBoldStyleHandler,
   setFormHeaderFontItalicStyleHandler,
   setFormHeaderFontUnderlineStyleHandler,
+  deleteteFormHeaderImage,
 } from "../controllers/formController.js";
 
 const formRoute = Router();
@@ -114,7 +115,7 @@ formRoute.put(
   isEditor,
   setFormHeaderFontUnderlineStyleHandler
 );
-// TODO
+
 formRoute.post(
   "/add-image-header/:formId",
   isAuthenticated,
@@ -122,13 +123,21 @@ formRoute.post(
   upload.single("headerImage"),
   addFormHeaderImage
 );
-// TODO
+
 formRoute.put(
   "/update-image-header/:formId",
   isAuthenticated,
   isEditor,
   upload.single("headerImage"),
   updateFormHeaderImage
+);
+
+
+formRoute.delete(
+  "/delete-image-header/:formId",
+  isAuthenticated,
+  isEditor,
+  deleteteFormHeaderImage
 );
 
 export { formRoute };

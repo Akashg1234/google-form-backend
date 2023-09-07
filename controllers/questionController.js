@@ -236,28 +236,30 @@ export const addImageToQuestion = handleAsync(
   async (req, res) => {
     
     // get new question title from the body
-    const file = req.files;
+    const file = req.file;
     // get the questionId from the params
     const questionId = req.params.questionId;
 
-    let newQuestion = await questionModel.findById({
-      questionId,
-    });
+    let newQuestion = await questionModel.findById(questionId);
+
     if (!newQuestion) {
       errorThrow("Question not found", 404, "Missing document");
     }
 
-    const myCloud = await fileUploadToCloudinary(file[0].path);
-// add the image url and public id to the question 
-    newQuestion.imageOfTheQuestion.public_id=myCloud.public_id;
-    newQuestion.imageOfTheQuestion.url=myCloud.secure_url;
-    
+    const myCloud = await fileUploadToCloudinary(file.path);
+    // add the image url and public id to the question 
+    if(myCloud){
+    newQuestion.imageOfTheQuestion.public_id = myCloud.public_id;
+    newQuestion.imageOfTheQuestion.url = myCloud.secure_url;
+
     await newQuestion.save();
 
     res.status(200).json({
       success: true,
       newQuestion,
     });
+    }
+      
   },
   (err, req, res, next) => next(err)
 );

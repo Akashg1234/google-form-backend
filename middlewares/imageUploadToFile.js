@@ -1,8 +1,7 @@
 import multer, { diskStorage } from "multer";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
-import DataUriParser from "datauri/parser.js";
-
+import fs from "fs";
 
 export const cloudinaryConfig=(req,res,next)=>{
   cloudinary.config({
@@ -11,21 +10,23 @@ export const cloudinaryConfig=(req,res,next)=>{
     api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true,
   });
-  console.log("config in use.....");
+  console.log("cloudinary config in use.....");
   next()
 }
 
 // Set up Multer storage and configuration
 const storage = diskStorage({
   destination:function(req,file,cb){
+    // console.log('destination');
     // cb for (error,destination)
-    cb(null,'./uploads')
+    return cb(null,'./upload')
   
   },
   filename:function(req,file,cb){
+    // console.log('filename');
     const newFileName = Date.now()+req.user._id+file.originalname
     // cb for (error,filename)
-    cb(null,newFileName)
+    return cb(null,newFileName)
   }
 })
 
@@ -47,14 +48,15 @@ const storage = diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const allowedFileTypes = /pdf|doc|docx|jpg|jpeg|png/;
-  // console.log(file);
+  // console.log("filter file",file);
   const extname = allowedFileTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedFileTypes.test(file.mimetype);
   
   if (extname && mimetype) {
-    cb(null, true);
+    // console.log("file sended");
+    return cb(null, true);
   } else {
-    cb(new Error('Only certain file types are allowed'),false);
+    return cb(new Error('Only certain file types are allowed'),false);
   }
 };
 
@@ -63,15 +65,22 @@ export const upload = multer({ storage: storage,fileFilter:fileFilter});
 
 
 export const fileUploadToCloudinary = async (filePath) => {
-  // console.log("fileUploadToCloudinary",file);
+  // console.log("fileUploadToCloudinary:", filePath);
   const myCloud = await cloudinary.uploader.upload(filePath, {
-    resource_type: "auto",
+    resource_type: "image",
   });
-  console.log(myCloud);
+  
+  try {
+    fs.unlinkSync(filePath);
+  } catch (error) {
+    console.error(error);
+  }
+  
   return myCloud;
+  
 };
 
 
 export const fileDeleteFromCloudinary = async (assetPublicId) => {
-  await uploader.destroy(assetPublicId, { resource_type: "auto" });
+  await cloudinary.uploader.destroy(assetPublicId, { resource_type: "image" });
 };

@@ -4,7 +4,8 @@ import {
   isResponcer,
   isEditor,
 } from "../middlewares/authentication.js";
-import { addCorrectAnswer, addImageCaptionToQuestion, addMultipleAnswer, addParagraphAnswer, addShortAnswer, createQuestion, deleteImageCaptionToQuestion, deleteQuestion, setAllowedSpecificFileType, setAnswerSuffelHandler, setFileSize, setNumberOfFiles, setQuestionIsRequired, setQuestionTitleStyleBoldHandler, setQuestionTitleStyleItalicHandler, setQuestionTitleStyleUnderlineHandler, setSpecificFileType, updateImageAllignmentToQuestion, updateQuestionTitle, updateTypesOfQuestion, updateVideoAllignmentToQuestion } from "../controllers/questionController.js";
+import { addCorrectAnswer, addImageCaptionToQuestion, addImageToQuestion, addMultipleAnswer, createQuestion, deleteImageCaptionToQuestion, deleteQuestion, setAllowedSpecificFileType, setAnswerSuffelHandler, setFileSize, setNumberOfFiles, setQuestionIsRequired, setQuestionTitleStyleBoldHandler, setQuestionTitleStyleItalicHandler, setQuestionTitleStyleUnderlineHandler, setSpecificFileType, updateImageAllignmentToQuestion, updateQuestionTitle, updateTypesOfQuestion, updateVideoAllignmentToQuestion } from "../controllers/questionController.js";
+import { upload } from "../middlewares/imageUploadToFile.js";
 
 export const questionRoute = Router();
 
@@ -141,4 +142,11 @@ questionRoute.post(
   isEditor,
   setNumberOfFiles
 );
-
+// add image to question
+questionRoute.post(
+  "/add-image-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  upload.single("questionImage"),
+  addImageToQuestion
+);
