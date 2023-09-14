@@ -56,14 +56,15 @@ const fileFilter = (req, file, cb) => {
     // console.log("file sended");
     return cb(null, true);
   } else {
+    // error 
     return cb(new Error('Only certain file types are allowed'),false);
   }
 };
 
-
+// multer upload instance
 export const upload = multer({ storage: storage,fileFilter:fileFilter});
 
-
+// upload the file to cloudinary
 export const fileUploadToCloudinary = async (filePath) => {
   // console.log("fileUploadToCloudinary:", filePath);
   const myCloud = await cloudinary.uploader.upload(filePath, {
@@ -80,7 +81,49 @@ export const fileUploadToCloudinary = async (filePath) => {
   
 };
 
-
+// delete the file from cloudinary
 export const fileDeleteFromCloudinary = async (assetPublicId) => {
   await cloudinary.uploader.destroy(assetPublicId, { resource_type: "image" });
+};
+// upload the video file to cloudinary
+export const videoFileUploadToCloudinary = async (filePath) => {
+  // console.log("fileUploadToCloudinary:", filePath);
+  const myCloud = await cloudinary.uploader.upload(filePath, {
+    resource_type: "video",
+  });
+  
+  try {
+    fs.unlinkSync(filePath);
+  } catch (error) {
+    console.error(error);
+  }
+  
+  return myCloud;
+  
+};
+
+// delete the video file from cloudinary
+export const videoFileDeleteFromCloudinary = async (assetPublicId) => {
+  await cloudinary.uploader.destroy(assetPublicId, { resource_type: "video" });
+};
+// raw file upload to cloudinary
+export const rawFileUploadToCloudinary = async (filePath) => {
+  // console.log("fileUploadToCloudinary:", filePath);
+  const myCloud = await cloudinary.uploader.upload(filePath, {
+    resource_type: "raw",
+  });
+// delete the file from the server
+  
+  try {
+    fs.unlinkSync(filePath);
+  } catch (error) {
+    console.error(error);
+  }
+
+  return myCloud;
+};
+
+// raw file delete from cloudinary
+export const rawFileDeleteFromCloudinary = async (assetPublicId) => {
+  await cloudinary.uploader.destroy(assetPublicId, { resource_type: "raw" });
 };

@@ -110,12 +110,12 @@ formRoute.put(
   setFormHeaderFontItalicStyleHandler
 );
 formRoute.put(
-  "/set-header-font-understand/:formId",
+  "/set-header-font-underline/:formId",
   isAuthenticated,
   isEditor,
   setFormHeaderFontUnderlineStyleHandler
 );
-
+// add the header image
 formRoute.post(
   "/add-image-header/:formId",
   isAuthenticated,
@@ -123,7 +123,7 @@ formRoute.post(
   upload.single("headerImage"),
   addFormHeaderImage
 );
-
+// update the header image
 formRoute.put(
   "/update-image-header/:formId",
   isAuthenticated,
@@ -132,7 +132,7 @@ formRoute.put(
   updateFormHeaderImage
 );
 
-
+// delete the header image
 formRoute.delete(
   "/delete-image-header/:formId",
   isAuthenticated,

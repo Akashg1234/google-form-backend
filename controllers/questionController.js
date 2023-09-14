@@ -14,6 +14,7 @@ const checkUrl=(givenUrl)=>{
   }
 
 }
+
 export const createQuestion= handleAsync(async (req, res) => {
   const { questionTitle, typeOfAnsField, givenAnswerOptions } = req.body;
   
@@ -264,7 +265,7 @@ export const addImageToQuestion = handleAsync(
   (err, req, res, next) => next(err)
 );
 
-
+// delete image of the question
 export const deleteImageToQuestion = handleAsync(
   async (req, res) => {
     // get the questionId from the params

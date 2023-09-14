@@ -103,13 +103,11 @@ const formId = req.params.formId;
   },
   (err, req, res, next) => next(err)
 );
-// bug should be fixed
+
 // add form header image
 export const addFormHeaderImage = handleAsync(
   async (req, res) => {
     
-    // get the form id from the url
-    const formId = req.params.formId;
     // find the form by id and update the form title
     let newForm = await formModel.findById(req.form._id);
 
@@ -229,7 +227,7 @@ export const updateFormHeaderFont = handleAsync(
   (err, req, res, next) => next(err)
 );
 
-
+// update form header font size
 export const updateFormHeaderFontSize = handleAsync(
   async (req, res) => {
     // form heading font from the request body
@@ -380,7 +378,7 @@ export const shareFormViaEmails = handleAsync(
       errorThrow("Form not found", 404, "Missing document");
     }
 
-    const url = `${process.env.CLIENT_URL}/form/${newForm.uniqueLink}`;
+    const url = `${process.env.CLIENT_URL}/form/${newForm._id}/${newForm.uniqueLink}/viewform`;
 
     const html = `<b>Hi there!</b>
                     <br>

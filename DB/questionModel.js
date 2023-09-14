@@ -109,7 +109,7 @@ const questionSchema = new Schema(
     // is this question required to be answered
     required: {
       type: Boolean,
-      default:false
+      default: false,
     },
     // question font
     questionFont: {
@@ -139,11 +139,11 @@ const questionSchema = new Schema(
           type: String,
         },
       ],
-      responces: [
-        {
-          type: String,
-        },
-      ],
+      responces:[{
+          type: Schema.Types.ObjectId,
+          ref: "Response",
+        }],
+  
     },
   },
   { timestamps: true }

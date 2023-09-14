@@ -4,9 +4,38 @@ import {
   isResponcer,
   isEditor,
 } from "../middlewares/authentication.js";
-import { addCorrectAnswer, addImageCaptionToQuestion, addImageToQuestion, addMultipleAnswer, createQuestion, deleteImageCaptionToQuestion, deleteQuestion, setAllowedSpecificFileType, setAnswerSuffelHandler, setFileSize, setNumberOfFiles, setQuestionIsRequired, setQuestionTitleStyleBoldHandler, setQuestionTitleStyleItalicHandler, setQuestionTitleStyleUnderlineHandler, setSpecificFileType, updateImageAllignmentToQuestion, updateQuestionTitle, updateTypesOfQuestion, updateVideoAllignmentToQuestion } from "../controllers/questionController.js";
+import {
+  addCorrectAnswer,
+  addImageCaptionToQuestion,
+  addImageToQuestion,
+  addMultipleAnswer,
+  createQuestion,
+  deleteImageCaptionToQuestion,
+  deleteQuestion,
+  setAllowedSpecificFileType,
+  setAnswerSuffelHandler,
+  setFileSize,
+  setNumberOfFiles,
+  setQuestionIsRequired,
+  setQuestionTitleStyleBoldHandler,
+  setQuestionTitleStyleItalicHandler,
+  setQuestionTitleStyleUnderlineHandler,
+  setSpecificFileType,
+  updateImageAllignmentToQuestion,
+  updateQuestionTitle,
+  updateTypesOfQuestion,
+  updateVideoAllignmentToQuestion,
+  deleteImageToQuestion,
+  updateImageToQuestion,
+  addVideoCaptionToQuestion,
+  deleteVideoCaptionToQuestion,
+  addVideoToQuestion,
+  deleteVideoToQuestion,
+} from "../controllers/questionController.js";
 import { upload } from "../middlewares/imageUploadToFile.js";
 
+
+// giveResponse
 export const questionRoute = Router();
 
 questionRoute.post('/create-question/:formId',isAuthenticated,isEditor,createQuestion)
@@ -58,6 +87,13 @@ questionRoute.put(
   isAuthenticated,
   isEditor,
   updateImageAllignmentToQuestion
+);
+
+questionRoute.put(
+  "/update-video-allignment-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  updateVideoAllignmentToQuestion
 );
 
 questionRoute.put(
@@ -149,4 +185,48 @@ questionRoute.post(
   isEditor,
   upload.single("questionImage"),
   addImageToQuestion
+);
+
+// delete image to question
+questionRoute.delete(
+  "/delete-image-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  deleteImageToQuestion
+);
+// update image to question
+questionRoute.delete(
+  "/update-image-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  upload.single("questionImage"),
+  updateImageToQuestion
+);
+// add video caption to the question
+questionRoute.post(
+  "/add-video-caption-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  addVideoCaptionToQuestion
+);
+// delete video caption to the question
+questionRoute.delete(
+  "/delete-video-caption-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  deleteVideoCaptionToQuestion
+);
+// add video to the question
+questionRoute.post(
+  "/delete-video-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  addVideoToQuestion
+);
+// delete video to the question
+questionRoute.post(
+  "/delete-video-to-question/:formId/question/:questionId",
+  isAuthenticated,
+  isEditor,
+  deleteVideoToQuestion
 );
