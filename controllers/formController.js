@@ -445,17 +445,18 @@ export const getAllResponses = handleAsync(
     const formId = req.params.formId;
 
     // find the form by id and update the form title
-    const newForm = await formModel.findById(formId);
+    const responseWithQuestion = await formModel
+      .findById(formId)
+      .populate("questions")
+      .populate("responses");
 
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
 
-    const url = `${process.env.CLIENT_URL}/form/view/${newForm.uniqueLink}`;
-
     res.status(200).json({
       success: true,
-      url,
+      responseWithQuestion,
     });
   },
   (err, req, res, next) => next(err)
