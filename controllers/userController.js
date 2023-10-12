@@ -18,8 +18,9 @@ export const handleUserRegister = handleAsync(async (req, res) => {
 
 export const handleUserLogin = handleAsync(
   async (req, res) => {
+    
     const { email, password } = req.body;
-
+// console.log(email + "--" + password);
     const user = await userModel
       .findOne({  email })
       .select("+password");

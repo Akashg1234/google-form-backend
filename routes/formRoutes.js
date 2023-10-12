@@ -31,7 +31,7 @@ const formRoute = Router();
 
 formRoute.get('/all-forms',isAuthenticated,getAllFormOfTheOwner)
 formRoute.post('/create-form',isAuthenticated,handleUserFormCreation)
-formRoute.put('/update-form',isAuthenticated,isEditor)
+formRoute.put('/update-form/:formId',isAuthenticated,isEditor)
 formRoute.delete('/delete-form/:formId',isAuthenticated,isEditor,deleteTheForm)
 formRoute.get('/get-form/:formId',isAuthenticated,isResponcer,getTheForm)
 formRoute.put('/edit-form/title/:formId',isAuthenticated,isEditor,updateFormTitle)

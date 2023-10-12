@@ -7,7 +7,7 @@ const formSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    
+
     formTitle: {
       type: String,
       required: true,
@@ -39,6 +39,22 @@ const formSchema = new Schema(
         size: {
           type: Number,
           default: 16,
+        },
+      },
+      formDescriptionText: {
+        description: { type: String },
+        font: {
+          text: { type: String, default: "Arial" },
+
+          style: {
+            bold: { type: Boolean, default: false },
+            italic: { type: Boolean, default: false },
+            underline: { type: Boolean, default: false },
+          },
+          size: {
+            type: Number,
+            default: 10,
+          },
         },
       },
     },

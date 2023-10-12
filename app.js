@@ -10,16 +10,19 @@ import { responseRoute } from './routes/responseRoute.js';
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(
+console.log(process.env.SMTP_PASS);
+const middlewares = [
   cors({
-    origin: process.env.FRONT_END_URL,
+    origin: "http://localhost:3000",
     credentials: true,
-    
-  })
-);
+  }),
+  express.json(),
+  express.urlencoded({ extended: false }),
+  cookieParser(),
+];
+
+app.use(middlewares);
+
 app.use("/*", cloudinaryConfig);
 app.use('/user',userRouter)
 app.use('/form',formRoute)

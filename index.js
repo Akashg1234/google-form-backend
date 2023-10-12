@@ -1,11 +1,13 @@
 import { config } from "dotenv";
+
+config({
+  path: "./config/config.env",
+});
+
 import app from "./app.js";
 import { dataBaseConnection } from "./DB/dbUtils.js";
 import chalk from "chalk";
 
-config({
-    path:'./config/config.env'
-});
 
 
 dataBaseConnection().then(()=>{

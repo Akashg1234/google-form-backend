@@ -18,14 +18,15 @@ export const getAllFormOfTheOwner = handleAsync(
 },
   (err, req, res, next) => next(err)
 )
+// form creation by user
 export const handleUserFormCreation = handleAsync(
   async (req, res) => {
     const {formTitle,formHeadingText} = req.body;
-
+// creating thr hash secret
     const hashSecret = Date.now().toString()+process.env.HASH_SECRET
-
+// create the unique link
     const uniqueLink = createHash('sha256').update(hashSecret).digest('hex')
-
+// now cr4eate the form
     const newForm = await formModel.create({
       creator: req.user._id,
       formTitle: formTitle,
@@ -126,6 +127,7 @@ export const addFormHeaderImage = handleAsync(
       if (!uploadResult) {
         errorThrow("Error in file upload", 400, "Internal or server error");
       } else {
+        // assign the asset credentials
         newForm.headerImage.public_id = uploadResult.public_id;
         newForm.headerImage.url = uploadResult.secure_url;
 
@@ -160,7 +162,7 @@ export const updateFormHeaderImage = handleAsync(
     await fileDeleteFromCloudinary(newForm.headerImage.public_id)
     // upload file to the cloudinary
     const myCloud = await fileUploadToCloudinary(file.path);
-    
+    // assign credentials
     newForm.headerImage.public_id= myCloud.public_id
     newForm.headerImage.url= myCloud.secure_url
     
@@ -185,7 +187,7 @@ export const deleteteFormHeaderImage = handleAsync(
     }
     // delete the old file from the cloudinary
     await fileDeleteFromCloudinary(newForm.headerImage.public_id)
-    
+    // removing image credentials
     newForm.headerImage.public_id= undefined;
     newForm.headerImage.url= undefined;
     
@@ -214,7 +216,7 @@ export const updateFormHeaderFont = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-      
+    // assign header font text
     newForm.header.font.text = formHeadingFont;
 
     await newForm.save()
@@ -241,9 +243,9 @@ export const updateFormHeaderFontSize = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-    
+    // assign header font size
     newForm.header.font.size = Number(formHeadingFontSize)
-      
+    // save the form
     await newForm.save();
      
 
@@ -269,7 +271,7 @@ export const updateFormFont = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-      
+    // update generel form font
     newForm.textFont=formFont
     
     await newForm.save()
@@ -296,7 +298,7 @@ export const updateFormFontSize = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-      
+    // assign text font size
     newForm.textFontSize= Number(formFontSize),
       
     await newForm.save()
@@ -323,7 +325,7 @@ export const updateQuestionFontSize = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-
+// assign the question font size
     newForm.question.font.size = Number(formQuestionFontSize);
 
     await newForm.save();
@@ -350,7 +352,7 @@ export const updateQuestionFont = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-      
+      // assigning the question font
     newForm.question.font.text = formQuestionFont
 
     await newForm.save()
@@ -377,9 +379,9 @@ export const shareFormViaEmails = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-
+// creating the url
     const url = `${process.env.CLIENT_URL}/form/${newForm._id}/${newForm.uniqueLink}/viewform`;
-
+// creating the html template for mail
     const html = `<b>Hi there!</b>
                     <br>
                         <i>
@@ -399,7 +401,7 @@ export const shareFormViaEmails = handleAsync(
       to:emailAddresses,
       html:html
     }
-
+// send the mail 
     await sendMail(data)
 
     res.status(200).json({
@@ -424,7 +426,7 @@ export const createLink = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-
+// create the unique link
     const url = `${process.env.FRONT_END_URL}/form/view/${newForm.uniqueLink}`;
 
     res.status(200).json({
@@ -435,7 +437,7 @@ export const createLink = handleAsync(
   (err, req, res, next) => next(err)
 );
 
-// responce of all questions
+// responce of all questions ** LOGIC HAVE TO ADD**
 export const getAllResponses = handleAsync(
   async (req, res) => {
     
@@ -536,7 +538,7 @@ export const setFormHeaderFontUnderlineStyleHandler = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-    // set form question suffle
+    // set form header font style underline 
     newForm.header.font.style.underline = req.body.underline;
 
     await newForm.save();
@@ -558,7 +560,7 @@ export const setFormQuestionFontUnderlineStyleHandler = handleAsync(
     if (!newForm) {
       errorThrow("Form not found", 404, "Missing document");
     }
-    // set form question style
+    // set form question underline style
     newForm.question.font.style.underline = req.body.underline;
 
     await newForm.save();
@@ -592,7 +594,7 @@ export const setFormQuestionFontBoldStyleHandler = handleAsync(
   },
   (err, req, res, next) => next(err)
 );
-// set the header font style underline
+// set the header font style italic
 export const setFormQuestionFontItalicStyleHandler = handleAsync(
   async (req, res) => {
     
@@ -607,6 +609,142 @@ export const setFormQuestionFontItalicStyleHandler = handleAsync(
 
     await newForm.save();
     
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set the header description
+export const setFormHeaderDescriptionHandler  = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question style
+    newForm.header.formDescriptionText.description = req.body.formDescription;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set the header description font
+export const setFormHeaderDescriptionFont  = handleAsync(
+  async (req, res) => {
+    
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set form question style
+    newForm.header.formDescriptionText.font.text = req.body.formDescriptionFont;
+
+    await newForm.save();
+    
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set the header description font size
+export const setFormHeaderDescriptionFontSize  = handleAsync(
+  async (req, res) => {
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set header description font size
+    newForm.header.formDescriptionText.font.size =
+      req.body.formDescriptionFontSize;
+
+    await newForm.save();
+
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header description font bold
+export const setFormHeaderDescriptionStyleBold  = handleAsync(
+  async (req, res) => {
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set header description font bold
+    newForm.header.formDescriptionText.font.style.bold =
+      req.body.formDescriptionBold;
+
+    await newForm.save();
+
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+// set the header description font italic
+export const setFormHeaderDescriptionStyleItalic  = handleAsync(
+  async (req, res) => {
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set header description font bold
+    newForm.header.formDescriptionText.font.style.italic =
+      req.body.formDescriptionItalic;
+
+    await newForm.save();
+
+    res.status(200).json({
+      success: true,
+      newForm,
+    });
+  },
+  (err, req, res, next) => next(err)
+);
+
+// set the header description font underline
+export const setFormHeaderDescriptionStyleUnderline  = handleAsync(
+  async (req, res) => {
+    // find the form by id and update the form title
+    const newForm = await formModel.findById(req.form._id);
+
+    if (!newForm) {
+      errorThrow("Form not found", 404, "Missing document");
+    }
+    // set header description font underline
+    newForm.header.formDescriptionText.font.style.underline =
+      req.body.formDescriptionUnderline;
+
+    await newForm.save();
+
     res.status(200).json({
       success: true,
       newForm,

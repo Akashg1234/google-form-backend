@@ -100,8 +100,15 @@ const questionSchema = new Schema(
         type: Boolean,
         default: false,
       },
-
+      checkBoxGrid: {
+        type: Boolean,
+        default: false,
+      },
       dropDown: {
+        type: Boolean,
+        default: false,
+      },
+      fileUpload: {
         type: Boolean,
         default: false,
       },
@@ -139,11 +146,12 @@ const questionSchema = new Schema(
           type: String,
         },
       ],
-      responces:[{
+      responces: [
+        {
           type: Schema.Types.ObjectId,
           ref: "Response",
-        }],
-  
+        },
+      ],
     },
   },
   { timestamps: true }
