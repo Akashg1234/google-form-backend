@@ -29,7 +29,8 @@
     ```
 3. **Start the Server**:
    ```
-   npm start```
+   npm start
+   ```
    
 4. **API End Points**
    #### User
