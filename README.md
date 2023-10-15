@@ -31,10 +31,14 @@
    ```
    npm start```
 4. **API End Points**
-   ### User
+   #### User
 
    ```
    /user/register : User register
    /user/login : User login
    /user/logout : User logout
    ```
+   #### Form
+
+   ```
+   /form/all-forms :Get all forms cr
