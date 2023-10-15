@@ -29,12 +29,12 @@
     ```
 3. **Start the Server**:
    ```
-   npm start
-  ```
-4. **API Endpoints**:
-*User*
-```
-/user/register : User register
-/user/login : User login
-/user/logout : User logout
-```
+   npm start```
+4. **API End Points**
+   ### User
+
+   ```
+   /user/register : User register
+   /user/login : User login
+   /user/logout : User logout
+   ```
