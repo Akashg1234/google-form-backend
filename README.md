@@ -138,3 +138,15 @@ Feel free to add these features to your project documentation with the correspon
    /response/get-response-of-the-user/:userId/form/:formId/question/:questionId : Get the response of the
    /response/get-the-response/form/:formId/response/:responceId : Get the perticular response of the form
    /response/response/form/:formId/question/:questionId : Submit the response of the form
+   ```
+   ## :handshake: Contributing
+
+   We welcome contributions from the community! If you find any bugs or have suggestions for improvements, please feel free to open an issue or submit a pull request.
+   
+   ## :scroll: License
+   
+   This project is licensed under the MIT License.
+   
+   ---
+   
+   Thank you for using our backend repository for the Ecommerce Clothing Brand for Men website. If you have any questions or need assistance, don't hesitate to reach out! Happy coding!
