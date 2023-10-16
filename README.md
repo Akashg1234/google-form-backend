@@ -129,3 +129,12 @@ Feel free to add these features to your project documentation with the correspon
    /question/add-video-to-question/:formId/question/:questionId : Add video to the question
    /question/delete-video-to-question/:formId/question/:questionId : Remove video to the question
    ```
+
+   #### Response
+
+   ```
+   /response/get-all-response/:formId : Get all the responses of a form
+   /response/get-response/:formId/question/:questionId : Get the response of the question of the form
+   /response/get-response-of-the-user/:userId/form/:formId/question/:questionId : Get the response of the
+   /response/get-the-response/form/:formId/response/:responceId : Get the perticular response of the form
+   /response/response/form/:formId/question/:questionId : Submit the response of the form
