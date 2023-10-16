@@ -3,7 +3,7 @@
 
 🚀 Welcome to the Google Forms Clone backend! This awesome server-side component powers your innovative form creation and management app.
 
-## Features of the form 🌟
+## 🌟 **Features of the form** 🌟
 
 - ✅ User Authentication
 - ✅ Create, Retrieve, and Delete Forms
@@ -14,6 +14,40 @@
 - ✅ Cloudinary Integration for Image Uploads
 - ✅ Font Customization (Header and Form)
 - ✅ Share Forms via Email or Unique Links
+
+## 🌟 **Question Features** 🌟
+
+1. ✅ Create a Question
+2. ❌ Delete a Question
+3. 📝 Update the Question Title
+4. 🔄 Update the Type of Question
+5. 📢 Add Question Answers
+6. 🌄 Add Image Caption
+7. 🚫 Remove Image from Question
+8. 🔄 Update Image Alignment
+9. 🔄 Update Video Alignment
+10. 🎲 Option to Shuffle Answers
+11. ✔️ Add Correct Answers
+12. 🔒 Set Question as Mandatory
+13. 🅱️ Set Bold Formatting
+14. * Set Italic Formatting
+15. U Set Underline Formatting
+16. 📎 Set Specific Special File Type Checkbox
+17. 💼 Choose the Type of File
+18. 📏 Set File Size
+19. ➕ Set Number of Files
+20. 🖼️ Add an Image to the Question
+21. 🗑️ Remove the Image from the Question
+22. 🔄 Update the Image of the Question
+23. 📄 Add Video Caption to the Question
+24. 🗑️ Remove Video Caption from the Question
+25. 🎬 Add Video to the Question
+26. 🗑️ Remove Video from the Question
+
+Your users will have an amazing time creating and customizing questions with these fantastic features! 🚀
+
+Feel free to add these features to your project documentation with the corresponding icons and styling for a playful touch.
+
 
 ## Get Started 🚀
 
