@@ -142,14 +142,6 @@ questionRoute.put(
 
 
 questionRoute.put(
-  "/set-question-title-style-underline/:formId/question/:questionId",
-  isAuthenticated,
-  isEditor,
-  setQuestionTitleStyleUnderlineHandler
-);
-
-
-questionRoute.put(
   "/set-required-specific-file-type/:formId/question/:questionId",
   isAuthenticated,
   isEditor,
@@ -218,7 +210,7 @@ questionRoute.delete(
 );
 // add video to the question
 questionRoute.post(
-  "/delete-video-to-question/:formId/question/:questionId",
+  "/add-video-to-question/:formId/question/:questionId",
   isAuthenticated,
   isEditor,
   addVideoToQuestion

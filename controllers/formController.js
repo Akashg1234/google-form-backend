@@ -462,7 +462,7 @@ export const getAllResponses = handleAsync(
   (err, req, res, next) => next(err)
 );
 
-// responce of all questions
+// suffel the questions
 export const setQuestionSuffelHandler = handleAsync(
   async (req, res) => {
     
